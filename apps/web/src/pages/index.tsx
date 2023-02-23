@@ -229,98 +229,6 @@ const Home: NextPage = () => {
     );
   };
 
-  //SEMAPHORE STUFF
-  const [identity, setIdentity] = useState<Identity>();
-  const [group, setGroup] = useState<Group>(new Group(1));
-
-  const [semaphoreProof, setSemaphoreProof] = useState('');
-
-  const externalNullifier = utils.formatBytes32String('Topic');
-  const snarkArtifactsPath = 'zkproof/../../artifacts/snark';
-
-  //for creating pool
-  const [pollId, setPollId] = useState('');
-  const [coordinator, setCoordinator] = useState('');
-  const [merkleTreeDepth, setmerkleTreeDepth] = useState('');
-
-  //create pool
-  const { config: createPollConfig } = usePrepareContractWrite({
-    address: '0x89490c95eD199D980Cdb4FF8Bac9977EDb41A7E7 ',
-    abi: SemaphoreVotingAbi,
-    functionName: 'createPoll',
-    args: [pollId, coordinator, merkleTreeDepth],
-  });
-
-  const { write: createPool } = useContractWrite(createPollConfig);
-
-  //for adding voter
-  const [identityCommitment, setIdentityCommitment] = useState('');
-
-  const { config: addVoterConfig } = usePrepareContractWrite({
-    address: '0x89490c95eD199D980Cdb4FF8Bac9977EDb41A7E7 ',
-    abi: SemaphoreVotingAbi,
-    functionName: 'addVoter',
-    args: [pollId, identityCommitment],
-  });
-
-  const { write: addVoter } = useContractWrite(addVoterConfig);
-
-  //for start pool
-  const [encryptionKey, setEncryptionKey] = useState('');
-
-  const { config: startPollConfig } = usePrepareContractWrite({
-    address: '0x89490c95eD199D980Cdb4FF8Bac9977EDb41A7E7 ',
-    abi: SemaphoreVotingAbi,
-    functionName: 'startPoll',
-    args: [pollId, encryptionKey],
-  });
-
-  const { write: startPoll } = useContractWrite(startPollConfig);
-
-  //for cast vote
-  const [semaphoreVote, setSemaphoreVote] = useState('');
-  const [nullifierHash, setNullifierHash] = useState('');
-
-  const { config: castVoteConfig } = usePrepareContractWrite({
-    address: '0x89490c95eD199D980Cdb4FF8Bac9977EDb41A7E7 ',
-    abi: SemaphoreVotingAbi,
-    functionName: 'startPoll',
-    args: [identityCommitment],
-  });
-
-  const { write: castVote } = useContractWrite(castVoteConfig);
-
-  const createIdentity = () => {
-    const _identity = new Identity();
-    setIdentity(_identity);
-    console.log(_identity.commitment);
-  };
-
-  const joinGroup = () => {
-    console.log(group.members);
-    const newGroup = new Group(1);
-    newGroup.addMember(identity.commitment);
-    setGroup(newGroup);
-  };
-
-  const greeting = utils.formatBytes32String('Hello World');
-
-  const fullProof = async () => {
-    const result = await generateProof(
-      identity,
-      group,
-      externalNullifier,
-      greeting
-      // {
-      //   wasmFilePath: `${snarkArtifactsPath}/semaphore.wasm`,
-      //   zkeyFilePath: `${snarkArtifactsPath}/semaphore.zkey`,
-      // }
-    );
-
-    const verified = await verifyMember(result, 20);
-    console.log(verified);
-  };
-
   return (
     <>
       <main
@@ -495,40 +403,6 @@ const Home: NextPage = () => {
               {voteProof.length > 0 && (
                 <Text>{isVoteValid ? 'Valid proof' : 'Invalid proof'}</Text>
               )}
-
-              <Heading size={'xl'} marginTop="50px" marginBottom="20px">
-                Create an Identity
-              </Heading>
-              <Button
-                variant="solid"
-                bg="black"
-                _hover={{ bg: 'gray.600' }}
-                color="white"
-                onClick={createIdentity}
-                marginBottom="16px"
-              >
-                Create an Identity
-              </Button>
-              <Button
-                variant="solid"
-                bg="black"
-                _hover={{ bg: 'gray.600' }}
-                color="white"
-                onClick={joinGroup}
-                marginBottom="16px"
-              >
-                Join a Group
-              </Button>
-              <Button
-                variant="solid"
-                bg="black"
-                _hover={{ bg: 'gray.600' }}
-                color="white"
-                onClick={fullProof}
-                marginBottom="16px"
-              >
-                Create a full proof
-              </Button>
             </Flex>
 
             <footer>
